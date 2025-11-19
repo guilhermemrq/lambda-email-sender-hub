@@ -82,6 +82,20 @@
                 <version>3.5.2</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
+                                <exclude>META-INF/LICENSE</exclude>
+                                <exclude>META-INF/LICENSE.txt</exclude>
+                                <exclude>META-INF/NOTICE</exclude>
+                                <exclude>META-INF/NOTICE.txt</exclude>
+                                <exclude>META-INF/DEPENDENCIES</exclude>
+                                <exclude>META-INF/versions/9/module-info</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>

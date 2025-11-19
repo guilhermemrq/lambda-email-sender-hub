@@ -8,7 +8,7 @@ public class EmailService {
 
     private final EmailSender emailSender;
     private final EmailFormatter emailFormatter;
-    private static final String DEFAULT_FROM_EMAIL = "noreply@seutecchallenge.com";
+    private static final String DEFAULT_FROM_EMAIL = "redes.guilherme@gmail.com";
 
     public EmailService(EmailSender emailSender, EmailFormatter emailFormatter) {
         this.emailSender = emailSender;
