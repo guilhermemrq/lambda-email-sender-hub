@@ -13,36 +13,45 @@ import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 
+/**
+ * Handler para processar mensagens SQS e enviar e-mails.
+ */
 public class SqsEmailHandler implements RequestHandler<SQSEvent, Void> {
 
     private final EmailService emailService;
 
+    private static final String DEFAULT_FROM_EMAIL = "noreply@fiap.com.br";
+
     public SqsEmailHandler() {
         AmazonSimpleEmailService sesClient = AmazonSimpleEmailServiceClientBuilder.defaultClient();
-
         EmailSender sesSender = new SesEmailSender(sesClient);
         EmailFormatter formatter = new EmailFormatter();
-
-        this.emailService = new EmailService(sesSender, formatter);
+        this.emailService = new EmailService(sesSender, formatter, DEFAULT_FROM_EMAIL);
     }
 
     @Override
     public Void handleRequest(SQSEvent event, Context context) {
+        if (event == null || event.getRecords() == null) {
+            throw new IllegalArgumentException("Evento SQS inválido ou sem mensagens");
+        }
+
         context.getLogger().log("Recebido evento SQS com " + event.getRecords().size() + " mensagens.");
 
         for (SQSMessage message : event.getRecords()) {
             String messageBody = message.getBody();
-            context.getLogger().log("Processando Mensagem ID: " + message.getMessageId());
+            String messageId = message.getMessageId();
+            context.getLogger().log("Processando Mensagem ID: " + messageId);
 
             try {
                 EmailPayload payload = JsonMapper.fromJson(messageBody, EmailPayload.class);
-
                 emailService.processAndSend(payload);
+                context.getLogger().log("Mensagem " + messageId + " processada com sucesso");
 
             } catch (Exception e) {
-                context.getLogger().log("Falha no processamento da mensagem " + message.getMessageId() + ". Causa: " + e.getMessage());
-
-                throw new RuntimeException("Erro ao processar mensagem SQS.", e);
+                String errorMsg = String.format("Falha no processamento da mensagem %s. Causa: %s", 
+                    messageId, e.getMessage());
+                context.getLogger().log(errorMsg);
+                throw new RuntimeException(errorMsg, e);
             }
         }
 

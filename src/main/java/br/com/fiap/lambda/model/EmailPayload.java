@@ -11,6 +11,13 @@ public class EmailPayload {
 
     public EmailPayload() {
     }
+
+    public EmailPayload(String recipientEmail, String subject, String templateName, Map<String, String> templateData) {
+        this.recipientEmail = recipientEmail;
+        this.subject = subject;
+        this.templateName = templateName;
+        this.templateData = templateData;
+    }
     public String getRecipientEmail() {
         return recipientEmail;
     }
