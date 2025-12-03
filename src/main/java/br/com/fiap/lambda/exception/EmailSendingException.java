@@ -1,8 +1,4 @@
 package br.com.fiap.lambda.exception;
-
-/**
- * Exceção lançada quando ocorre um erro ao tentar enviar um e-mail.
- */
 public class EmailSendingException extends RuntimeException {
     
     /**

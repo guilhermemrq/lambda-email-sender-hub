@@ -10,10 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
 
-/**
- * Serviço responsável por processar e enviar e-mails.
- * Inclui validações e tratamento de erros robusto.
- */
 
 public class EmailService {
     private static final Logger logger = LogManager.getLogger(EmailService.class);
@@ -22,14 +18,6 @@ public class EmailService {
     private final EmailFormatter emailFormatter;
     private final String defaultFromEmail;
 
-    /**
-     * Constrói uma nova instância de EmailService.
-     * 
-     * @param emailSender Implementação do serviço de envio de e-mail
-     * @param emailFormatter Formatador de e-mail
-     * @param defaultFromEmail E-mail remetente padrão
-     * @throws IllegalArgumentException se algum parâmetro for nulo
-     */
     public EmailService(EmailSender emailSender, EmailFormatter emailFormatter, String defaultFromEmail) {
         this.emailSender = Objects.requireNonNull(emailSender, "EmailSender não pode ser nulo");
         this.emailFormatter = Objects.requireNonNull(emailFormatter, "EmailFormatter não pode ser nulo");
@@ -40,65 +28,77 @@ public class EmailService {
         }
     }
 
-    /**
-     * Processa e envia um e-mail com base no payload fornecido.
-     * 
-     * @param payload Dados do e-mail a ser enviado
-     * @throws ValidationException se o payload for inválido
-     * @throws EmailSendingException se ocorrer um erro ao enviar o e-mail
-     */
     public void processAndSend(EmailPayload payload) {
         try {
             validatePayload(payload);
             
-            logger.debug("Iniciando processamento do e-mail para: {}", payload.getRecipientEmail());
+            logger.debug("Iniciando processamento do feedback do estudante: {}", payload.getNomeEstudante());
             
             String htmlBody = emailFormatter.format(payload);
             logger.debug("E-mail formatado com sucesso");
 
+            String to = determinarDestinatario(payload.getUrgencia());
+            String subject = String.format("Feedback %s - %s", 
+                payload.getUrgencia().name().toLowerCase(), 
+                payload.getAssuntoResumido());
+
             EmailDetails details = new EmailDetails(
                 defaultFromEmail,
-                payload.getRecipientEmail(),
-                payload.getSubject(),
+                to,
+                subject,
                 htmlBody
             );
             
-            logger.info("Enviando e-mail para: {}", details.getTo());
+            logger.info("Enviando e-mail para: {}", to);
             emailSender.send(details);
-            logger.info("E-mail enviado com sucesso para: {}", details.getTo());
+            logger.info("E-mail de feedback enviado com sucesso para: {}", to);
             
         } catch (Exception e) {
-            String errorMsg = String.format("Falha ao processar/enviar e-mail para %s: %s", 
-                payload != null ? payload.getRecipientEmail() : "[destinatário desconhecido]", 
-                e.getMessage());
+            String errorMsg = String.format("Falha ao processar/enviar e-mail: %s", e.getMessage());
+            String studentInfo = payload != null ? 
+                String.format("Estudante: %s <%s>", 
+                    payload.getNomeEstudante() != null ? payload.getNomeEstudante() : "[sem nome]", 
+                    payload.getEmailEstudante()) : 
+                "[dados do estudante não disponíveis]";
             
-            logger.error(errorMsg, e);
+            logger.error("{} - {}", studentInfo, errorMsg, e);
             throw new EmailSendingException(errorMsg, e);
+        }
+    }
+
+    private void validatePayload(EmailPayload payload) {
+        if (payload == null) {
+            throw new ValidationException("payload", "O payload do feedback não pode ser nulo");
+        }
+        
+        if (payload.getEmailEstudante() == null || payload.getEmailEstudante().trim().isEmpty()) {
+            throw new ValidationException("emailEstudante", "O e-mail do estudante é obrigatório");
+        }
+        
+        if (payload.getDescricao() == null || payload.getDescricao().trim().isEmpty()) {
+            throw new ValidationException("descricao", "A descrição do feedback é obrigatória");
+        }
+        
+        if (payload.getNota() < 0 || payload.getNota() > 10) {
+            throw new ValidationException("nota", "A nota deve estar entre 0 e 10");
+        }
+        
+        if (payload.getUrgencia() == null) {
+            throw new ValidationException("urgencia", "O nível de urgência é obrigatório");
         }
     }
     
     /**
-     * Valida o payload do e-mail.
-     * 
-     * @param payload Payload a ser validado
-     * @throws ValidationException se o payload for inválido
+     * Determina o destinatário do e-mail com base no nível de urgência
      */
-    private void validatePayload(EmailPayload payload) {
-        if (payload == null) {
-            throw new ValidationException("payload", "O payload não pode ser nulo");
+    private String determinarDestinatario(EmailPayload.Urgencia urgencia) {
+        switch (urgencia) {
+            case ALTA:
+                return "suporte@fiap.com.br";
+            case MEDIA:
+                return "feedback@fiap.com.br";
+            case BAIXA:
+            default:
+                return "relatorios@fiap.com.br";
         }
-        
-        if (payload.getRecipientEmail() == null || payload.getRecipientEmail().trim().isEmpty()) {
-            throw new ValidationException("recipientEmail", "O e-mail do destinatário não pode estar vazio");
-        }
-        
-        if (payload.getSubject() == null || payload.getSubject().trim().isEmpty()) {
-            throw new ValidationException("subject", "O assunto do e-mail não pode estar vazio");
-        }
-        
-        // Se houver templateData, garante que não seja vazio
-        if (payload.getTemplateData() != null && payload.getTemplateData().isEmpty()) {
-            logger.warn("TemplateData está vazio para o e-mail: {}", payload.getRecipientEmail());
-        }
-    }
     }

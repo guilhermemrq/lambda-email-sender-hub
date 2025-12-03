@@ -5,10 +5,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
-/**
- * Classe que representa os detalhes de um e-mail a ser enviado.
- * Inclui validações para garantir a integridade dos dados.
- */
 public class EmailDetails {
     
     @NotBlank(message = "O remetente não pode estar em branco")
@@ -25,15 +21,6 @@ public class EmailDetails {
     @NotBlank(message = "O conteúdo do e-mail não pode estar em branco")
     private final String bodyHtml;
 
-    /**
-     * Constrói uma nova instância de EmailDetails com os parâmetros fornecidos.
-     * 
-     * @param from Endereço de e-mail do remetente
-     * @param to Endereço de e-mail do destinatário
-     * @param subject Assunto do e-mail
-     * @param bodyHtml Conteúdo HTML do e-mail
-     * @throws ValidationException se algum dos parâmetros for inválido
-     */
     public EmailDetails(String from, String to, String subject, String bodyHtml) {
         this.from = Objects.requireNonNull(from, "O remetente não pode ser nulo").trim();
         this.to = Objects.requireNonNull(to, "O destinatário não pode ser nulo").trim();
