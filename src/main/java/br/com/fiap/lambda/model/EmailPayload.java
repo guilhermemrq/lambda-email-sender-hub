@@ -1,26 +1,41 @@
 package br.com.fiap.lambda.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
+/**
+ * Modelo de payload para feedbacks críticos.
+ * Apenas feedbacks com urgência CRÍTICA são processados pela fila SQS.
+ */
 public class EmailPayload {
     private String descricao;
     private int nota;
+    
+    @JsonProperty("emailEstudante")
     private String emailEstudante;
+    
+    @JsonProperty("nomeEstudante")
     private String nomeEstudante;
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonProperty("dataHora")
     private LocalDateTime dataHora;
     
-    private Urgencia urgencia;
+    @JsonProperty("feedbackId")
+    private String feedbackId;
     
-    public enum Urgencia {
-        BAIXA, MEDIA, ALTA
-    }
+    @JsonProperty("correlationId")
+    private String correlationId;
+    
+    @JsonProperty("className")
+    private String className;
+    
+    @JsonProperty("teacherName")
+    private String teacherName;
 
     public EmailPayload() {
     }
-
 
     public String getDescricao() {
         return descricao;
@@ -62,24 +77,35 @@ public class EmailPayload {
         this.dataHora = dataHora;
     }
 
-    public Urgencia getUrgencia() {
-        return urgencia;
+    public String getFeedbackId() {
+        return feedbackId;
     }
 
-    public void setUrgencia(Urgencia urgencia) {
-        this.urgencia = urgencia;
-    }
-    
-    public void setUrgencia(String urgencia) {
-        this.urgencia = Urgencia.valueOf(urgencia.toUpperCase());
+    public void setFeedbackId(String feedbackId) {
+        this.feedbackId = feedbackId;
     }
 
-    public String getAssuntoResumido() {
-        String nome = getNomeEstudante() != null ? getNomeEstudante() : "Estudante";
-        String descricaoResumida = getDescricao().length() > 30 ? 
-            getDescricao().substring(0, 30) + "..." : getDescricao();
-            
-        return String.format("Feedback de %s - Nota: %d - %s", 
-            nome, getNota(), descricaoResumida);
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 }

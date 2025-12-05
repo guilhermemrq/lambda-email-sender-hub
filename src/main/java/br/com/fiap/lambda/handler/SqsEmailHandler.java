@@ -12,10 +12,6 @@ import com.amazonaws.services.lambda.runtime.events.SQSEvent;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
-
-/**
- * Handler para processar mensagens SQS e enviar e-mails.
- */
 public class SqsEmailHandler implements RequestHandler<SQSEvent, Void> {
 
     private final EmailService emailService;

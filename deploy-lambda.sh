@@ -11,26 +11,37 @@ export HANDLER="br.com.fiap.lambda.handler.SqsEmailHandler::handleRequest"
 export RUNTIME="java11"
 export MEMORY_SIZE="512"
 export TIMEOUT="30"
-export AWS_REGION="us-east-1"
-export LAMBDA_ROLE_ARN="arn:aws:iam::992382492436:role/FeedbackHubLambdaExecutionRole"
+export AWS_REGION="sa-east-1"
+export LAMBDA_ROLE_ARN="arn:aws:iam::992382492436:role/FeedbackHubLambdaEmailSender"
 export ENVIRONMENT_VARS='{"Variables":{"FROM_EMAIL":"redes.guilherme@gmail.com"}}'
+
+# Configurações da Fila SQS - Feedbacks Críticos
+export AWS_ACCOUNT_ID="992382492436"
+export SQS_QUEUE_NAME="feedback-critical-queue"
+export SQS_QUEUE_URL="https://sqs.sa-east-1.amazonaws.com/992382492436/feedback-critical-queue"
+export SQS_QUEUE_ARN="arn:aws:sqs:sa-east-1:992382492436:feedback-critical-queue"
+export SQS_BATCH_SIZE="10"
 
 # Caminho para o arquivo ZIP
 export ZIP_FILE="fileb://${TARGET_DIR}/function.zip"
 
 # Função de ajuda
 usage() {
-  echo "Uso: ./deploy-lambda.sh [create|update|invoke|delete]"
+  echo "Uso: ./deploy-lambda.sh [create|update|invoke|delete|setup-sqs|remove-sqs]"
   echo "Comandos disponíveis:"
-  echo "  create  - Cria uma nova função Lambda"
-  echo "  update  - Atualiza uma função Lambda existente"
-  echo "  invoke  - Invoca a função Lambda com um evento de teste"
-  echo "  delete  - Remove a função Lambda"
+  echo "  create     - Cria uma nova função Lambda"
+  echo "  update     - Atualiza uma função Lambda existente"
+  echo "  invoke     - Invoca a função Lambda com um evento de teste"
+  echo "  delete     - Remove a função Lambda"
+  echo "  setup-sqs  - Configura o gatilho SQS para a Lambda"
+  echo "  remove-sqs - Remove o gatilho SQS da Lambda"
   echo ""
   echo "Variáveis de ambiente:"
   echo "  FUNCTION_NAME: Nome da função Lambda (padrão: SqsEmailHandler)"
-  echo "  AWS_REGION: Região AWS (padrão: us-east-1)"
+  echo "  AWS_REGION: Região AWS (padrão: sa-east-1)"
   echo "  LAMBDA_ROLE_ARN: ARN da função IAM para a Lambda"
+  echo "  SQS_QUEUE_NAME: Nome da fila SQS (padrão: email-queue)"
+  echo "  SQS_BATCH_SIZE: Tamanho do lote de mensagens (padrão: 10)"
 }
 
 # Verifica se o comando é válido

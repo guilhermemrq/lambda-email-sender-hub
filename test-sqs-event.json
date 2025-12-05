@@ -3,34 +3,34 @@
     {
       "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
       "receiptHandle": "MessageReceiptHandle",
-      "body": "{\"recipientEmail\":\"destinatario@exemplo.com\",\"subject\":\"Novo Feedback Recebido\",\"templateName\":\"URGENT_FEEDBACK\",\"templateData\":{\"urgency_level\":\"Alta\",\"comment\":\"Preciso de ajuda urgente com o conteúdo da última aula. Não estou conseguindo acompanhar o ritmo das aulas.\"}}",
+      "body": "{\"feedbackId\":\"b50f1ee-4e2a-4f9a-a3d2-0f1e2a3b4c5d\",\"emailEstudante\":\"aluno@example.com\",\"nomeEstudante\":\"João Silva\",\"nota\":2,\"descricao\":\"Aluno solicitou encerramento de contrato e relatou problemas de conexão\",\"urgencia\":\"CRITICA\",\"dataHora\":\"2025-12-05T14:30:00\",\"correlationId\":\"corr-987654\",\"className\":\"Arquitetura de Software\",\"teacherName\":\"Prof. João Silva\"}",
       "attributes": {
         "ApproximateReceiveCount": "1",
-        "SentTimestamp": "1523232000000",
-        "SenderId": "123456789012",
-        "ApproximateFirstReceiveTimestamp": "1523232000001"
+        "SentTimestamp": "1733347800000",
+        "SenderId": "992382492436",
+        "ApproximateFirstReceiveTimestamp": "1733347800001"
       },
       "messageAttributes": {},
       "md5OfBody": "7b270e59b47ff90a5d1c96b6f2a6c3e8",
       "eventSource": "aws:sqs",
-      "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:feedback-queue",
-      "awsRegion": "us-east-1"
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:992382492436:feedback-critical-queue",
+      "awsRegion": "sa-east-1"
     },
     {
       "messageId": "2f2d3d5e-8c9a-4b9d-8e1f-3a1b2c3d4e5f",
       "receiptHandle": "MessageReceiptHandle2",
-      "body": "{\"recipientEmail\":\"suporte@exemplo.com\",\"subject\":\"Feedback sobre o Curso\",\"templateName\":\"DEFAULT\",\"templateData\":{\"message\":\"Gostaria de parabenizar a equipe pelo excelente conteúdo!\"}}",
+      "body": "{\"feedbackId\":\"c60g2ff-5f3b-5g0b-b4e3-1g2f3b4c5d6e\",\"emailEstudante\":\"maria@example.com\",\"nomeEstudante\":\"Maria Santos\",\"nota\":1,\"descricao\":\"Problemas graves de comunicação e falta de suporte. Solicitando cancelamento imediato.\",\"urgencia\":\"CRITICA\",\"dataHora\":\"2025-12-05T15:45:00\",\"correlationId\":\"corr-123456\",\"className\":\"Desenvolvimento Web\",\"teacherName\":\"Prof. Ana Costa\"}",
       "attributes": {
         "ApproximateReceiveCount": "1",
-        "SentTimestamp": "1523232100000",
-        "SenderId": "123456789012",
-        "ApproximateFirstReceiveTimestamp": "1523232100001"
+        "SentTimestamp": "1733352300000",
+        "SenderId": "992382492436",
+        "ApproximateFirstReceiveTimestamp": "1733352300001"
       },
       "messageAttributes": {},
       "md5OfBody": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
       "eventSource": "aws:sqs",
-      "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:feedback-queue",
-      "awsRegion": "us-east-1"
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:992382492436:feedback-critical-queue",
+      "awsRegion": "sa-east-1"
     }
   ]
 }

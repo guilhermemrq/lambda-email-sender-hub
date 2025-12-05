@@ -1,0 +1,103 @@
+{
+  "note": "⚠️ IMPORTANTE: Apenas feedbacks com urgência CRÍTICA são enviados para a fila SQS",
+  "examples": [
+    {
+      "name": "Feedback Crítico - Solicitação de Cancelamento",
+      "payload": {
+        "feedbackId": "b50f1ee-4e2a-4f9a-a3d2-0f1e2a3b4c5d",
+        "emailEstudante": "aluno@example.com",
+        "nomeEstudante": "João Silva",
+        "nota": 1,
+        "descricao": "Aluno solicitou encerramento de contrato e relatou problemas graves de conexão e falta de suporte adequado.",
+        "urgencia": "CRITICA",
+        "dataHora": "2025-12-05T14:30:00",
+        "correlationId": "corr-987654",
+        "className": "Arquitetura de Software",
+        "teacherName": "Prof. João Silva"
+      }
+    },
+    {
+      "name": "Feedback Crítico - Problema Técnico Grave",
+      "payload": {
+        "feedbackId": "c60g2ff-5f3b-5g0b-b4e3-1g2f3b4c5d6e",
+        "emailEstudante": "maria@example.com",
+        "nomeEstudante": "Maria Santos",
+        "nota": 2,
+        "descricao": "Não consegui acessar a plataforma durante toda a semana. Sistema apresenta erros constantes e perdi prazos importantes.",
+        "urgencia": "CRITICA",
+        "dataHora": "2025-12-05T15:45:00",
+        "correlationId": "corr-123456",
+        "className": "Desenvolvimento Web",
+        "teacherName": "Prof. Ana Costa"
+      }
+    },
+    {
+      "name": "Feedback Crítico - Insatisfação Severa",
+      "payload": {
+        "feedbackId": "d70h3gg-6g4c-6h1c-c5f4-2h3g4c5d6e7f",
+        "emailEstudante": "pedro@example.com",
+        "nomeEstudante": "Pedro Oliveira",
+        "nota": 1,
+        "descricao": "Extremamente insatisfeito com a qualidade do curso. Conteúdo desatualizado e professor despreparado. Exijo reembolso.",
+        "urgencia": "CRITICA",
+        "dataHora": "2025-12-05T16:20:00",
+        "correlationId": "corr-456789",
+        "className": "Banco de Dados",
+        "teacherName": "Prof. Carlos Mendes"
+      }
+    },
+    {
+      "name": "Feedback Crítico - Falta de Comunicação",
+      "payload": {
+        "feedbackId": "e80i4hh-7h5d-7i2d-d6g5-3i4h5d6e7f8g",
+        "emailEstudante": "ana@example.com",
+        "nomeEstudante": "Ana Paula",
+        "nota": 2,
+        "descricao": "Professor não responde mensagens há 2 semanas. Estou completamente perdida no curso e sem orientação.",
+        "urgencia": "CRITICA",
+        "dataHora": "2025-12-05T17:00:00",
+        "correlationId": "corr-789012",
+        "className": "Gestão de Projetos",
+        "teacherName": "Prof. Roberto Lima"
+      }
+    },
+    {
+      "name": "Feedback Crítico - Cobrança Indevida",
+      "payload": {
+        "feedbackId": "f90j5ii-8i6e-8j3e-e7h6-4j5i6e7f8g9h",
+        "emailEstudante": "lucas@example.com",
+        "nomeEstudante": "Lucas Ferreira",
+        "nota": 1,
+        "descricao": "Fui cobrado duas vezes pela mesma mensalidade. Tentei contato com financeiro mas não obtive retorno. Situação urgente!",
+        "urgencia": "CRITICA",
+        "dataHora": "2025-12-05T18:15:00",
+        "correlationId": "corr-345678",
+        "className": "Cloud Computing",
+        "teacherName": "Prof. Mariana Lima"
+      }
+    }
+  ],
+  "schema": {
+    "description": "Estrutura do payload de feedback CRÍTICO",
+    "required": ["emailEstudante", "nota", "descricao", "urgencia"],
+    "optional": ["feedbackId", "nomeEstudante", "dataHora", "correlationId", "className", "teacherName"],
+    "fields": {
+      "feedbackId": "ID único do feedback (UUID)",
+      "emailEstudante": "Email do estudante que enviou o feedback",
+      "nomeEstudante": "Nome completo do estudante",
+      "nota": "Nota de 0 a 10 (feedbacks críticos geralmente têm notas baixas: 1-3)",
+      "descricao": "Descrição detalhada do problema crítico",
+      "urgencia": "Nível de urgência: DEVE SER 'CRITICA' para ser processado pela fila SQS",
+      "dataHora": "Data e hora do feedback no formato ISO 8601 (yyyy-MM-dd'T'HH:mm:ss)",
+      "correlationId": "ID de correlação para rastreamento",
+      "className": "Nome da turma/disciplina",
+      "teacherName": "Nome do professor"
+    },
+    "important_notes": [
+      "⚠️ Apenas feedbacks com urgencia='CRITICA' são enviados para a fila SQS",
+      "Feedbacks críticos requerem ação imediata da equipe de gestão",
+      "O email gerado terá visual de alerta com fundo amarelo e bordas vermelhas",
+      "Notas típicas de feedbacks críticos: 1-3 (muito baixas)"
+    ]
+  }
+}
