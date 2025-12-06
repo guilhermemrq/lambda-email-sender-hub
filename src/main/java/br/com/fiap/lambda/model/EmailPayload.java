@@ -4,10 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
-/**
- * Modelo de payload para feedbacks críticos.
- * Apenas feedbacks com urgência CRÍTICA são processados pela fila SQS.
- */
 public class EmailPayload {
     private String descricao;
     private int nota;

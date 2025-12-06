@@ -1,0 +1,11 @@
+{
+  "feedbackId": "test-001",
+  "emailEstudante": "aluno@example.com",
+  "nomeEstudante": "João Silva",
+  "nota": 1,
+  "descricao": "Teste de feedback crítico - Lambda criada com sucesso! Este é um teste de integração do sistema de notificações de feedbacks críticos.",
+  "dataHora": "2025-12-06T10:30:00",
+  "correlationId": "test-corr-001",
+  "className": "Arquitetura de Software",
+  "teacherName": "Prof. Carlos"
+}

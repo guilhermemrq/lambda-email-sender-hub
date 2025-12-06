@@ -1,24 +1,22 @@
-# Lambda Email Sender
+# 📧 Lambda Email Sender - Sistema de Notificação de Feedbacks Críticos
 
-Função AWS Lambda para processar **feedbacks críticos** a partir de uma fila Amazon SQS e enviar alertas por email usando Amazon SES.
+Função AWS Lambda que processa feedbacks críticos de uma fila SQS e envia e-mails para **todos os administradores ativos** cadastrados no banco de dados.
 
 ## 📋 Visão Geral
 
-Este projeto implementa um handler Lambda que:
-- Recebe mensagens de **feedbacks críticos** de uma fila Amazon SQS
-- Processa apenas feedbacks com urgência **CRITICA**
-- Envia emails de alerta usando Amazon SES (Simple Email Service)
+Este projeto implementa um sistema completo de notificação que:
+- ✅ Recebe mensagens de feedbacks críticos via Amazon SQS
+- ✅ Busca todos os administradores ativos no banco RDS Aurora Serverless
+- ✅ Envia e-mails formatados em HTML para cada administrador via Amazon SES
+- ✅ Registra estatísticas de sucesso/falha no CloudWatch
 
-## ⚠️ Importante
+## 🎯 Funcionalidades
 
-**Apenas feedbacks com `urgencia: "CRITICA"` são processados pela fila SQS.**
-
-Feedbacks críticos incluem:
-- 🚫 Solicitações de cancelamento
-- 🔧 Problemas técnicos graves
-- 😠 Insatisfação severa
-- 💰 Problemas financeiros/cobranças
-- 📞 Falta de comunicação/suporte
+- **Broadcast Automático**: E-mails enviados para todos os admins ativos
+- **Encoding UTF-8**: Suporte completo a caracteres especiais do português
+- **Template HTML Profissional**: E-mails formatados sem emojis
+- **Integração com RDS**: Busca dinâmica de destinatários do banco
+- **Logs Detalhados**: Rastreamento completo no CloudWatch
 
 ## 🚀 Quick Start
 
@@ -29,204 +27,161 @@ Feedbacks críticos incluem:
 - AWS CLI configurado
 - Conta AWS com acesso a Lambda, SQS e SES
 
-### 2. Build do Projeto
+### 2. Deploy Rápido
 
-```bash
-mvn clean package
+```powershell
+# Deploy completo (build + deploy)
+.\deploy.ps1
+
+# Deploy + teste automático
+.\deploy.ps1 -SendTestMessage
+
+# Apenas deploy (sem rebuild)
+.\deploy.ps1 -SkipBuild -SendTestMessage
 ```
-
-### 3. Criar a Fila SQS
-
-```bash
-chmod +x create-sqs-queue.sh
-./create-sqs-queue.sh
-```
-
-### 4. Deploy da Lambda com SQS
-
-```bash
-chmod +x deploy-lambda.sh
-./deploy-lambda.sh create
-```
-
-Este comando irá:
-- Criar a função Lambda
-- Configurar automaticamente o gatilho SQS
-
-### 5. Testar o Envio de Email
-
-```bash
-chmod +x send-test-message.sh
-./send-test-message.sh
-```
-
-## 📚 Documentação Detalhada
-
-- **[URGENCIA-CRITICA.md](./URGENCIA-CRITICA.md)** - ⚠️ Documentação sobre urgência CRÍTICA
-- **[SQS-SETUP.md](./SQS-SETUP.md)** - Guia completo de configuração do SQS
-- **[iam-policy-sqs.json](./iam-policy-sqs.json)** - Política IAM necessária
-- **[example-payloads.json](./example-payloads.json)** - Exemplos de payloads críticos
 
 ## 🔧 Configuração
 
-### Variáveis de Ambiente
+### Variáveis de Ambiente da Lambda
 
-Edite o arquivo `deploy-lambda.sh` para personalizar:
+As seguintes variáveis devem estar configuradas na Lambda:
 
 ```bash
-export FUNCTION_NAME="SqsEmailHandler"
-export AWS_REGION="sa-east-1"
-export SQS_QUEUE_NAME="feedback-critical-queue"
-export SQS_QUEUE_URL="https://sqs.sa-east-1.amazonaws.com/992382492436/feedback-critical-queue"
-export SQS_QUEUE_ARN="arn:aws:sqs:sa-east-1:992382492436:feedback-critical-queue"
-export SQS_BATCH_SIZE="10"
+FROM_EMAIL=redes.guilherme@gmail.com
+DB_CLUSTER_ARN=arn:aws:rds:sa-east-1:992382492436:cluster:database-course
+DB_SECRET_ARN=arn:aws:secretsmanager:sa-east-1:992382492436:secret:secret-db-nep8fY
+DB_NAME=dbcourse
 ```
 
-### Formato da Mensagem SQS (Feedback Crítico)
+### Permissões IAM Necessárias
 
-⚠️ **A urgência DEVE ser "CRITICA"**
+A role da Lambda precisa das seguintes permissões (ver `rds-data-policy.json`):
+
+- ✅ `rds-data:ExecuteStatement` - Para consultar o banco
+- ✅ `secretsmanager:GetSecretValue` - Para acessar credenciais
+- ✅ `ses:SendRawEmail` - Para enviar e-mails
+- ✅ `sqs:ReceiveMessage` - Para processar fila
+- ✅ `logs:CreateLogGroup/CreateLogStream/PutLogEvents` - Para logs
+
+### Formato da Mensagem SQS
 
 ```json
 {
-  "feedbackId": "uuid-001",
+  "feedbackId": "test-001",
   "emailEstudante": "aluno@example.com",
   "nomeEstudante": "João Silva",
   "nota": 1,
-  "descricao": "Aluno solicitou encerramento de contrato e relatou problemas graves.",
-  "urgencia": "CRITICA",
-  "dataHora": "2025-12-05T14:30:00",
-  "correlationId": "corr-001",
+  "descricao": "Teste de feedback crítico",
+  "dataHora": "2025-12-06T10:30:00",
+  "correlationId": "test-corr-001",
   "className": "Arquitetura de Software",
-  "teacherName": "Prof. João Silva"
+  "teacherName": "Prof. Carlos"
 }
 ```
 
-## 📦 Comandos Disponíveis
+## 📦 Scripts Disponíveis
 
-```bash
-# Criar Lambda com gatilho SQS
-./deploy-lambda.sh create
+### `deploy.ps1` - Script Principal de Deploy
 
-# Atualizar código da Lambda
-./deploy-lambda.sh update
-
-# Configurar gatilho SQS (se já existe)
-./deploy-lambda.sh setup-sqs
-
-# Remover gatilho SQS
-./deploy-lambda.sh remove-sqs
-
-# Deletar Lambda
-./deploy-lambda.sh delete
-
-# Invocar Lambda com evento de teste
-./deploy-lambda.sh invoke
+```powershell
+.\deploy.ps1                    # Build completo e deploy
+.\deploy.ps1 -SkipBuild         # Apenas deploy (sem rebuild)
+.\deploy.ps1 -SendTestMessage   # Deploy + enviar mensagem de teste
+.\deploy.ps1 -Help              # Mostra ajuda
 ```
 
-## 🔍 Monitoramento
+### Comandos Manuais
 
-### Ver logs em tempo real
+```powershell
+# Build
+.\mvnw clean package -DskipTests
 
-```bash
+# Deploy manual
+aws lambda update-function-code --function-name SqsEmailHandler --zip-file fileb://target/function.zip --region sa-east-1
+
+# Enviar mensagem de teste
+aws sqs send-message --queue-url https://sqs.sa-east-1.amazonaws.com/992382492436/feedback-critical-queue --message-body file://test-message.json --region sa-east-1
+
+# Ver logs
 aws logs tail /aws/lambda/SqsEmailHandler --follow --region sa-east-1
-```
-
-### Verificar event source mappings
-
-```bash
-aws lambda list-event-source-mappings \
-  --function-name SqsEmailHandler \
-  --region sa-east-1
 ```
 
 ## 🏗️ Arquitetura
 
 ```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   Cliente   │─────▶│  SQS Queue  │─────▶│   Lambda    │
-│             │      │ email-queue │      │  Handler    │
-└─────────────┘      └─────────────┘      └──────┬──────┘
-                                                  │
-                                                  ▼
-                                          ┌─────────────┐
-                                          │  Amazon SES │
-                                          │   (Email)   │
-                                          └─────────────┘
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│   Sistema    │─────▶│  SQS Queue   │─────▶│   Lambda     │
+│   Feedback   │      │   Critical   │      │   Handler    │
+└──────────────┘      └──────────────┘      └──────┬───────┘
+                                                    │
+                                                    ▼
+                                            ┌──────────────┐
+                                            │  RDS Aurora  │
+                                            │  (Busca      │
+                                            │   Admins)    │
+                                            └──────┬───────┘
+                                                    │
+                                                    ▼
+                                            ┌──────────────┐
+                                            │ Amazon SES   │
+                                            │ (Envia para  │
+                                            │  N admins)   │
+                                            └──────────────┘
 ```
 
 ## 🛠️ Tecnologias
 
 - **Java 11** - Linguagem de programação
-- **Maven** - Gerenciamento de dependências
+- **Maven 3.8+** - Gerenciamento de dependências
 - **AWS Lambda** - Computação serverless
 - **Amazon SQS** - Fila de mensagens
-- **Amazon SES** - Serviço de email
+- **Amazon SES** - Serviço de e-mail
+- **RDS Data API** - Acesso ao banco Aurora Serverless
+- **AWS Secrets Manager** - Gerenciamento de credenciais
+
+## 📊 Estrutura do Projeto
+
+```
+src/main/java/br/com/fiap/lambda/
+├── exception/          # Exceções customizadas
+├── gateway/            # Integração com SES
+├── handler/            # Handler principal da Lambda
+├── model/              # Models (EmailPayload, Usuario, etc)
+├── repository/         # Repository para acesso ao RDS
+├── service/            # Serviços (EmailBroadcastService, EmailFormatter)
+└── util/               # Utilitários (JsonMapper)
+```
+
+## 📝 Logs e Monitoramento
+
+### Exemplo de Log de Sucesso
+
+```
+Recebido evento SQS com 1 mensagens.
+Processando Mensagem ID: 909f2517-412f-429f-920f-410fe52c68fa
+Buscando administradores ativos
+Encontrados 2 administradores ativos
+Enviando e-mail para 2 administradores ativos
+E-mail enviado com sucesso para: rodriguesqueirozcaike@gmail.com
+E-mail enviado com sucesso para: redes.guilherme@gmail.com
+Broadcast concluído para mensagem 909f2517. Total: 2 usuários, Sucesso: 2, Falhas: 0
+Mensagem 909f2517 processada com sucesso
+```
+
+## 🔐 Segurança
+
+- ✅ Credenciais do banco armazenadas no AWS Secrets Manager
+- ✅ Permissões IAM com princípio de menor privilégio
+- ✅ Encoding UTF-8 para prevenir problemas de caracteres
+- ✅ Escape de HTML para prevenir XSS
+
+## 📚 Documentação Adicional
+
+- **[BROADCAST-FEATURE.md](./BROADCAST-FEATURE.md)** - Documentação completa da feature de broadcast
+- **[rds-data-policy.json](./rds-data-policy.json)** - Política IAM para RDS Data API
 
 ---
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
-
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
-
-## Running the application in dev mode
-
-You can run your application in dev mode that enables live coding using:
-
-```shell script
-./mvnw quarkus:dev
-```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
-
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./mvnw package
-```
-
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/lambda-email-sender-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- AWS Lambda ([guide](https://quarkus.io/guides/aws-lambda)): Write AWS Lambda functions
-
-## Provided Code
-
-### Amazon Lambda Integration example
-
-This example contains a Quarkus Greeting Lambda ready for Amazon.
-
-[Related guide section...](https://quarkus.io/guides/aws-lambda)
+**Desenvolvido para FIAP - Sistema de Gestão de Feedbacks**
 
 
