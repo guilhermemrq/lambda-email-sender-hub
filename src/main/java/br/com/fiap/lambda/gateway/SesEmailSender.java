@@ -44,17 +44,21 @@ public class SesEmailSender implements EmailSender {
     
     private SendRawEmailRequest createSendRawEmailRequest(EmailDetails details) {
         try {
+            String encodedSubject = java.util.Base64.getEncoder()
+                .encodeToString(details.getSubject().getBytes(StandardCharsets.UTF_8));
+            
+            String encodedBody = java.util.Base64.getEncoder()
+                .encodeToString(details.getBodyHtml().getBytes(StandardCharsets.UTF_8));
+            
             StringBuilder sb = new StringBuilder();
-            sb.append("From: ").append(details.getFrom()).append("\n");
-            sb.append("To: ").append(details.getTo()).append("\n");
-            sb.append("Subject: =?UTF-8?B?")
-              .append(java.util.Base64.getEncoder().encodeToString(details.getSubject().getBytes(StandardCharsets.UTF_8)))
-              .append("?=\n");
-            sb.append("MIME-Version: 1.0\n");
-            sb.append("Content-Type: text/html; charset=UTF-8\n");
-            sb.append("Content-Transfer-Encoding: quoted-printable\n");
-            sb.append("\n");
-            sb.append(toQuotedPrintable(details.getBodyHtml()));
+            sb.append("From: ").append(details.getFrom()).append("\r\n");
+            sb.append("To: ").append(details.getTo()).append("\r\n");
+            sb.append("Subject: =?UTF-8?B?").append(encodedSubject).append("?=\r\n");
+            sb.append("MIME-Version: 1.0\r\n");
+            sb.append("Content-Type: text/html; charset=UTF-8\r\n");
+            sb.append("Content-Transfer-Encoding: base64\r\n");
+            sb.append("\r\n");
+            sb.append(encodedBody);
             
             ByteBuffer rawMessage = ByteBuffer.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
             RawMessage message = new RawMessage(rawMessage);
@@ -67,40 +71,5 @@ public class SesEmailSender implements EmailSender {
         } catch (Exception e) {
             throw new EmailSendingException("Erro ao criar mensagem raw: " + e.getMessage(), e);
         }
-    }
-    
-    private String toQuotedPrintable(String text) {
-        if (text == null) {
-            return "";
-        }
-        
-        StringBuilder result = new StringBuilder();
-        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
-        int lineLength = 0;
-        
-        for (byte b : bytes) {
-            int value = b & 0xFF;
-            
-            if ((value >= 33 && value <= 60) || (value >= 62 && value <= 126)) {
-                result.append((char) value);
-                lineLength++;
-            } else if (value == 32) {
-                result.append(' ');
-                lineLength++;
-            } else if (value == 10) {
-                result.append("\n");
-                lineLength = 0;
-            } else {
-                result.append(String.format("=%02X", value));
-                lineLength += 3;
-            }
-            
-            if (lineLength >= 75) {
-                result.append("=\n");
-                lineLength = 0;
-            }
-        }
-        
-        return result.toString();
     }
 }
