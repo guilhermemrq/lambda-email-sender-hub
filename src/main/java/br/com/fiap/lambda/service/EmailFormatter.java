@@ -41,8 +41,8 @@ public class EmailFormatter {
         html.append("<div class=\"alert-box\">ESTE FEEDBACK REQUER ATENÇÃO URGENTE E PRIORITÁRIA</div>");
 
         html.append("  <p><strong>Estudante:</strong> ")
-            .append(payload.getNomeEstudante() != null ? payload.getNomeEstudante() : "Estudante")
-            .append(" &lt;").append(payload.getEmailEstudante()).append("&gt;</p>");
+            .append(payload.getEmailEstudante() != null ? payload.getEmailEstudante() : "N/A")
+            .append("</p>");
 
         if (payload.getClassName() != null || payload.getTeacherName() != null) {
             html.append("  <div class=\"metadata\">")

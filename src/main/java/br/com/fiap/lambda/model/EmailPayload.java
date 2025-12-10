@@ -5,30 +5,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public class EmailPayload {
-    private String descricao;
-    private int nota;
-    
-    @JsonProperty("emailEstudante")
-    private String emailEstudante;
-    
-    @JsonProperty("nomeEstudante")
-    private String nomeEstudante;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonProperty("dataHora")
-    private LocalDateTime dataHora;
     
     @JsonProperty("feedbackId")
     private String feedbackId;
     
-    @JsonProperty("correlationId")
-    private String correlationId;
+    @JsonProperty("studentEmail")
+    private String emailEstudante;
     
     @JsonProperty("className")
     private String className;
     
     @JsonProperty("teacherName")
     private String teacherName;
+    
+    @JsonProperty("rating")
+    private int nota;
+    
+    @JsonProperty("description")
+    private String descricao;
+    
+    @JsonProperty("urgencia")
+    private String urgencia;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSSSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]")
+    @JsonProperty("dataEnvio")
+    private LocalDateTime dataHora;
+    
+    @JsonProperty("correlationId")
+    private String correlationId;
 
     public EmailPayload() {
     }
@@ -57,12 +61,12 @@ public class EmailPayload {
         this.emailEstudante = emailEstudante;
     }
 
-    public String getNomeEstudante() {
-        return nomeEstudante;
+    public String getUrgencia() {
+        return urgencia;
     }
 
-    public void setNomeEstudante(String nomeEstudante) {
-        this.nomeEstudante = nomeEstudante;
+    public void setUrgencia(String urgencia) {
+        this.urgencia = urgencia;
     }
 
     public LocalDateTime getDataHora() {

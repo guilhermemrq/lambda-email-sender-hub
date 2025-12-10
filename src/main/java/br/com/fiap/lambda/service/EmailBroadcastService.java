@@ -86,8 +86,8 @@ public class EmailBroadcastService {
     }
 
     private String buildSubject(EmailPayload payload) {
-        String nome = payload.getNomeEstudante() != null ? payload.getNomeEstudante() : "Estudante";
-        return String.format("FEEDBACK CRITICO - %s - Nota: %d/10", nome, payload.getNota());
+        String email = payload.getEmailEstudante() != null ? payload.getEmailEstudante() : "Estudante";
+        return String.format("FEEDBACK CRITICO - %s - Nota: %d/10", email, payload.getNota());
     }
 
     public static class BroadcastResult {

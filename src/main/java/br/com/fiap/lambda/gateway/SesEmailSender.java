@@ -7,8 +7,6 @@ import com.amazonaws.services.simpleemail.model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class SesEmailSender implements EmailSender {
@@ -29,8 +27,15 @@ public class SesEmailSender implements EmailSender {
         logger.debug("Preparando para enviar e-mail para: {}", details.getTo());
         
         try {
-            SendRawEmailRequest request = createSendRawEmailRequest(details);
-            sesClient.sendRawEmail(request);
+            SendEmailRequest request = new SendEmailRequest()
+                .withSource(details.getFrom())
+                .withDestination(new Destination().withToAddresses(details.getTo()))
+                .withMessage(new Message()
+                    .withSubject(new Content().withCharset("UTF-8").withData(details.getSubject()))
+                    .withBody(new Body()
+                        .withHtml(new Content().withCharset("UTF-8").withData(details.getBodyHtml()))));
+            
+            sesClient.sendEmail(request);
             
             logger.info("E-mail enviado com sucesso para: {}", details.getTo());
         } catch (Exception e) {
@@ -39,37 +44,6 @@ public class SesEmailSender implements EmailSender {
             
             logger.error(errorMsg, e);
             throw new EmailSendingException(errorMsg, e);
-        }
-    }
-    
-    private SendRawEmailRequest createSendRawEmailRequest(EmailDetails details) {
-        try {
-            String encodedSubject = java.util.Base64.getEncoder()
-                .encodeToString(details.getSubject().getBytes(StandardCharsets.UTF_8));
-            
-            String encodedBody = java.util.Base64.getEncoder()
-                .encodeToString(details.getBodyHtml().getBytes(StandardCharsets.UTF_8));
-            
-            StringBuilder sb = new StringBuilder();
-            sb.append("From: ").append(details.getFrom()).append("\r\n");
-            sb.append("To: ").append(details.getTo()).append("\r\n");
-            sb.append("Subject: =?UTF-8?B?").append(encodedSubject).append("?=\r\n");
-            sb.append("MIME-Version: 1.0\r\n");
-            sb.append("Content-Type: text/html; charset=UTF-8\r\n");
-            sb.append("Content-Transfer-Encoding: base64\r\n");
-            sb.append("\r\n");
-            sb.append(encodedBody);
-            
-            ByteBuffer rawMessage = ByteBuffer.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
-            RawMessage message = new RawMessage(rawMessage);
-            
-            return new SendRawEmailRequest()
-                .withRawMessage(message)
-                .withSource(details.getFrom())
-                .withDestinations(details.getTo());
-                
-        } catch (Exception e) {
-            throw new EmailSendingException("Erro ao criar mensagem raw: " + e.getMessage(), e);
         }
     }
 }
